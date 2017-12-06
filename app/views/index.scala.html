@@ -1,0 +1,75 @@
+@import helper._ ;
+@import views._ ; var counter = 1;
+
+@(message: String)
+
+@main("DPA Reservation") {
+    <div class="container">
+    	<div class="row">
+	    	<div class="col-md-4"></div>
+	    	<div class="col-md-4">
+	    		@customalert()
+	    		<div class="" style="margin-top:100px;">
+		    		@form(action = routes.ConferenceController.conference, 'id-> "confReservation" ,'method-> "post"){
+		    			<input type="hidden" id="conference" name="conference" value="">
+		    			<div class="row">
+		    				<div class="col-md-6">
+		    					<button onclick=selectConfRoom(this) id="aryabhatt" class="">
+				    				<div class="w3-orange w3-hover-shadow w3-center" style="width:200px;height:100px;">
+		  								<p>ARYABHATT</p>
+									</div>
+								</button>
+							</div>
+							<div class="col-md-6 col-md-push-1">
+								<button onclick=selectConfRoom(this) id="bhaskar" class="">
+			    					<div class="w3-red w3-hover-shadow w3-center" style="width:200px;height:100px;">
+	  									<p>BHASKAR</p>
+									</div>
+								</button>
+							</div>
+		    			</div>
+		    			<div class="row" style = "margin-top:10px;">
+		    				<div class="col-md-6">
+		    					<button onclick=selectConfRoom(this) id="meghdoot" class="">
+				    				<div class="w3-grey w3-hover-shadow w3-center" style="width:200px;height:100px;">
+		  								<p>MEGHDOOT</p>
+									</div>
+								</button>
+							</div>
+							<div class="col-md-6 col-md-push-1">
+								<button onclick=selectConfRoom(this) id="chandragupta" class="">
+				    				<div class="w3-green w3-hover-shadow w3-center" style="width:200px;height:100px;">
+		  								<p>CHANDRAGUPTA</p>
+									</div>
+								</div>
+							</div>
+		    			</div>
+					}
+					@form(action = routes.PantryController.pantry, 'id-> "pantryReservation" ,'method-> "post"){
+						<input type="hidden" id="pantry" value="">
+						<div class="col-md-6 col-md-offset-3" style = "margin-top:10px;">
+							<button onclick=selectPantry(this) id="pantry" class="">
+			    				<div class="w3-yellow w3-hover-shadow w3-center" style="width:200px;height:100px;">
+	  								<p>PANTRY</p>
+								</div>
+							</button>
+						</div>
+		    		}
+	    		</div>
+	    	</div>
+	    	<div class="col-md-4"></div>
+    	</div>
+    </div>
+}
+
+<script type="text/javascript">
+	function selectConfRoom(elem){
+		document.getElementById('conference').value=elem.id
+		document.getElementById('confReservation').submit();
+	}	
+	
+	function selectPantry(elem){
+		document.getElementById('pantry').value=elem.id
+		document.getElementById('pantryReservation').submit();
+	}
+</script>

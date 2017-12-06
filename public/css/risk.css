@@ -1,0 +1,15 @@
+.no-display{
+	display:none;
+}
+.show-display{
+	display:''
+}
+/*
+	View Trade
+*/
+#dealsTable > thead > tr > th{
+  text-align: left;
+}
+#dealsTable > tbody > tr > td{
+	text-align: left;
+}

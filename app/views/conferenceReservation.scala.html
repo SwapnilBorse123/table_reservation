@@ -1,0 +1,181 @@
+@import helper._ ;
+@import views._ ;
+
+@(name:String,empId:Integer,message: String,slots:List[String],resForm:Form[_])
+
+@main("DPA Reservation") {
+	<div class="container">
+		<div class="row">	
+	 		<div class="col-md-2">
+		    	<div class="row">
+		    		<div class="panel panel-info">
+		    			<div class="panel-heading">
+		    				Booked Slots:
+		    			</div>
+		    			<div class="panel-body">
+		    				<table class="table table-hover" id="slotsTable">
+	  							<thead>
+	  								<th>24 Hr Format</th>
+	  							</thead>
+	  							<tbody>
+								 	@for((slot,ctr) <- slots.zipWithIndex){
+										<tr>
+											<td>@slot</td>	
+										</tr>	 	
+								 	}							
+	  							</tbody>
+	  						</table>
+		    			</div>
+		    			<div class="panel-footer">
+		    			</div>
+		    		</div>
+		    	</div>
+		    </div>
+		    <div class="col-md-9 col-md-offset-1">
+		    	<div class="row">
+				    <div class="panel panel-info">
+				    	<div class="panel-heading">Conference Room Reservation: @message
+				    		<a href="/viewHistory" class="pull-right" target="_blank">View Reservations</a>
+				    	</div>
+			  			<div class="panel-body">
+				  			@form(action = routes.ConferenceController.handleConference(), 'id-> "confForm" ,'method-> "post"){
+				  				<form class="form-inline" role="form">
+									<div class="form-group" style="width:250px;">
+									    @helper.inputText(resForm("empName"),
+											'id -> "eName",
+											'name -> "eName",
+											'readonly -> "readonly",
+											'placeholder -> name,
+											'class -> "form-control required",
+											'_label-> "Employee Name:",
+											'_showConstraints -> false,
+											'_showErrors -> true
+										)
+							 	 	</div>
+									<div class="form-group" style="width:100px;">
+									    @helper.inputText(resForm("empId"),
+											'id -> "eId",
+											'name -> "eId",
+											'placeholder -> empId,
+											'readonly -> "readonly",
+											'class -> "form-control required",
+											'_label-> "Employee Id:",
+											'_showConstraints -> false,
+											'_showErrors -> true
+										)
+									</div>
+									<br><br>
+									<div class="form-group">
+										<label for="pwd">Start Time (Eg [10:30]):</label>
+			    						<input type="text" class="form-control" id="startTime" style="width:300px;">
+			    					</div>
+									<div style="display:none">			
+										<div class="form-group" style="width:300px;">
+											@helper.inputText(resForm("startTime"),
+												'id -> "hiddenstartTime",
+												'name -> "hiddenstartTime",
+												'class -> "form-control required",
+												'_label-> "Start Time (Eg [09:30]):",
+												'_showConstraints -> false,
+												'_showErrors -> true
+											)
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="pwd">End Time (Eg [15:30]):</label>
+			    						<input type="text" class="form-control" id="endTime" style="width:300px;">
+			    					</div>
+									<div style="display:none">
+										<div class="form-group" style="width:300px;">
+										    @helper.inputText(resForm("endTime"),
+												'id -> "hiddenendTime",
+												'name -> "hiddenendTime",
+												'class -> "form-control required",
+												'_label-> "End Time (Eg [15:30]):",
+												'_showConstraints -> false,
+												'_showErrors -> true
+											)
+										</div>
+									</div>
+									<div style="display:none">
+										<input type="hidden" id="hiddenConfName" value="@message">
+										<div class="form-group" style="width:300px;">
+									    @helper.inputText(resForm("confName"),
+											'id -> "confName",
+											'name -> "confName",
+											'label -> "Room",
+											'type-> "hidden",
+											'class -> "form-control required",
+											'_showConstraints -> false,
+											'_showErrors -> true
+										)
+										</div>
+									</div>
+		
+								</form>
+							}
+			  			</div>
+			  			<div class="panel-footer">
+			  				<button type="button" onclick=submitForm() class="btn btn-info">Submit</button>
+			  				<a href="/"><button type="button" class="btn btn-warning pull-right">Back</button></a>
+			  			</div>
+					</div>
+				</div>
+		    </div>	   
+	 	</div>
+	</div>
+}
+
+<script type="text/javascript">
+	function submitForm(){
+		document.getElementById('confName').value = document.getElementById('hiddenConfName').value
+		document.getElementById('eId').value = document.getElementById("eId").placeholder
+		document.getElementById('eName').value = document.getElementById("eName").placeholder
+		var startTimeStatus = getLongTime('startTime');
+		var endTimeStatus = getLongTime('endTime');
+		var status = validations();
+		if(status && startTimeStatus && endTimeStatus){
+			console.log('All statuses look good.')
+			document.getElementById('confForm').submit();
+		}
+		
+	}
+	
+	function getLongTime(id){
+		time = document.getElementById(id).value;
+		console.log('time :' + time);
+		var timeReg = new RegExp('^([\\d]{1,2}:[\\d]{2})$');
+		console.log('timeReg.test() :' + timeReg.test(time))
+		if(!timeReg.test(time)){
+			return false;
+		}
+		var d = new Date();
+		var hours = parseInt(time.split(":")[0]);
+		var minutes = parseInt(time.split(":")[1]);
+		if(parseInt(hours) > 24 || parseInt(minutes) > 60){
+			return false;
+		}
+		d.setHours(hours);
+		d.setMinutes(minutes);
+		document.getElementById('hidden'+id).value = d.getTime();
+		return true; 
+	}
+	
+	function validations(){
+		console.log(document.getElementById('hiddenstartTime').value +':'+ document.getElementById('hiddenendTime').value)
+			if(validateTime(document.getElementById('hiddenstartTime').value,document.getElementById('hiddenendTime').value)){
+				return true;	
+			}
+	}
+	
+	function validateTime(start,end) {
+		console.log('start :'+start);
+		console.log('end :'+end);
+		if(start >= end){
+			console.log('validateTime retured: ' +false);
+			return false;	
+		}
+		return true;
+	}
+
+</script>

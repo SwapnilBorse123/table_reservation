@@ -1,0 +1,38 @@
+@(userForm: Form[form.pojo.LoginForm],message: String)
+
+@import helper._ ;
+@import views._ ; var counter=1;
+
+
+@main("DPA Reservation") {
+    <div class="col-md-4 col-md-offset-4">
+        <div class="card card-container">
+        @customalert()
+        	<img id="profile-img" class="profile-img-card" src="@routes.Assets.versioned("images/avatar.png")" style="margin-left:130px;" />
+	            <p id="profile-name" class="profile-name-card"></p>
+	            @helper.form(routes.LoginController.authenticate) {
+	              	<div class="form-group">
+					  @helper.inputText(
+						userForm("username"),
+						'_showConstraints -> false,
+						'_label-> "Email:",
+						'placeholder->"Username",
+						'class->"form-control required"
+						)
+					</div>
+					<div class="form-group">
+					   @helper.inputText(
+						userForm("password"),
+						'_showConstraints -> false,
+						'_label-> "Password",
+						'placeholder->"Password",
+						'class->"form-control required",
+						'type->"password"
+						)
+					</div>
+	                <button  type="submit" class="btn btn-sm btn-primary btn-block btn-signin">Sign in</button>
+	            }
+        </div>
+    </div>
+    
+}

@@ -1,0 +1,122 @@
+/*Validation Javascripts for OMS*/
+/*
+  Method list isNumeric
+              isEmpty
+
+*/
+
+//Global Objects
+var NUMERIC_REGEX = '^\\d{1,3}(?:[,]\\d{3})*(([.](\\d)+)?)$';
+var QUANTITY_REGEX = '^\\d{1,3}(?:[,]\\d{3})*([M,K,B,m,k,b]?)$';
+var QUANTITY_REGEX_MOD = '^([1-9])+((.\\d{1,3}[K,k])|(.\\d{1,6}[M,m])|(.\\d{1,9}[B,b]))?$';
+/*
+^([1-9])+((.\\d{1,3}[K,k])|(.\\d{1,6}[M,m])|(.\\d{1,9}[B,b]))?$
+*/
+
+var POS_NEG_REGEX = '^(([+|-]?)(\\d)+(.)?(\\d)*)$';
+var ALPHABETIC_KEY_REGEX = '^(([A-Z]|[a-z]){1,2})$';
+var EMPTY_ALERT = " cannot be empty!";
+var NUMERIC_ALERT = " must be numeric!";
+var WHOLE_ALERT = " must be a whole number!";
+var SELECTION_ALERT = "Please select a ";
+var INCORRECT_KEY_ALERT = "Please enter alphabetic key (MAX:ZZ)"
+
+function Validation (){}
+
+Validation.prototype.validateJsonKeys = function () {
+	var jsonKeysArr = document.getElementsByName('jsonkey');
+	var allAlphabetic = true;
+	var allBlank = true;
+	for(i=0;i<jsonKeysArr.length;++i){
+		if(jsonKeysArr[i].value!=''){
+			allBlank=false;
+		}
+	}
+	if(allBlank){
+		return true;
+	}
+	for(i=0;i<jsonKeysArr.length;++i){
+		if(!jsonKeysArr[i].value.match(ALPHABETIC_KEY_REGEX)){
+			allAlphabetic = false;
+		}
+	}
+	if(allAlphabetic){
+		return true;
+	}else{
+		return false;
+	}
+};
+
+Validation.prototype.incorrectKeyAlert = function () {
+	alert(INCORRECT_KEY_ALERT);
+	return true;
+};
+
+Validation.prototype.emptyAlert = function (elemName) {
+	alert(elemName+EMPTY_ALERT);
+	return true;
+};
+
+Validation.prototype.numericAlert = function (elemName) {
+	alert(elemName+NUMERIC_ALERT);
+	return true;
+};
+
+Validation.prototype.selectionAlert = function (elemName) {
+	alert(SELECTION_ALERT+elemName+'!');
+	return true;
+};
+
+Validation.prototype.wholeAlert = function (elemName) {
+	alert(elemName+WHOLE_ALERT);
+	return true;
+};
+
+//Allowing only numeric values
+Validation.prototype.isNumeric = function (elemId) {
+    var elemVal=document.getElementById(elemId).value;
+    if(elemVal.match(NUMERIC_REGEX)){
+      return true;
+    }else if(elemVal.value==null || elemVal.value == ""){
+      return false;
+    }else{
+      return false;
+    }
+};
+
+Validation.prototype.isNegPosNumeric = function (elemId) {
+    var elemVal=document.getElementById(elemId).value;
+    if(elemVal.match(POS_NEG_REGEX)){
+      return true;
+    } else if(elemVal.value==null || elemVal.value == ""){
+      return false;
+    } else {
+      return false;
+    }
+};
+
+
+Validation.prototype.isQtyNumeric = function (elemId) {
+    var elemVal=document.getElementById(elemId).value;
+    if(elemVal.match(QUANTITY_REGEX)){
+      return true;
+    }else if(elemVal.value==null || elemVal.value == ""){
+      return false;
+    }else{
+      return false;
+    }
+};
+
+Validation.prototype.isEmpty = function (elemId) {
+  var elemVal=document.getElementById(elemId).value;
+  if(elemVal === "" || elemVal == null || elemVal == "Select" || elemVal == "select"){
+    return true;
+  }else{
+    return false;
+  }
+};
+
+Validation.prototype.isChecked = function (elemId) {
+  var checkbox= document.getElementById(elemId);
+  return checkbox.checked;
+};

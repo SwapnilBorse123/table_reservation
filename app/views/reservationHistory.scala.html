@@ -1,0 +1,61 @@
+@(message: String,resList : List[models.Reservation])
+
+@import form.utils.TimeFormatter;
+@import helper._ ;
+@import views._ ; var counter=1;
+
+
+@main("DPA Reservation") {
+    <div class="col-md-1"></div>
+    <div class="col-md-9">
+    	@customalert()
+    	<div class="row">
+    		<strong>Include: </strong><input type="text" name="filt" onkeyup="filterTable(this, resTable)" style="width:130px"/>
+    		<a href="/"><button type="button" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-home"></span> Home</button></a>
+    	</div>
+    	<div class="row">
+	    	 <div class="table-responsive" style="margin-top:10px;">
+	    	 
+	  			<table class="table table-bordered table-striped" id="resTable">
+	    			<thead>
+	    				<tr class="info">
+		    				<th>SrNo</th>
+		    				<th>Employee Name</th>
+		    				<th>Employee Id</th>
+		    				<th>Conference</th>
+		    				<th>Start Time</th>
+		    				<th>End Time</th>
+		    				<th>Cancel</th>
+	    				</tr>
+	    			</thead>
+	    			<tbody>
+	    			@for((rs,ctr) <- resList.zipWithIndex){
+	    				<tr class="default">
+		    				<td>@counter</td>
+		    				<td>@rs.empName</td>
+		    				<td>@rs.empId</td>
+		    				<td>@rs.confName</td>
+		    				<td>@TimeFormatter.formatTime(rs.startTime)</td>
+		    				<td>@TimeFormatter.formatTime(rs.endTime)</td>
+		    				<td id="emp@rs.id"><a href="/cancelReservation/@rs.id"><span class="glyphicon glyphicon-remove"></span></a></td>
+	    				<tr>
+	    				@(counter+=1)
+	    			}
+	    			</tbody>
+	  			</table>
+			</div>
+		</div> 
+    </div>
+    <div class="col-md-1"></div>
+}
+
+<script type="text/javascript">
+	function formatTime(milliseconds){
+		d = new Date(milliseconds);
+		hours = d.getHours();
+		minutes = d.getMinutes();
+		return hours+':'minutes;
+	}
+	
+	
+</script>

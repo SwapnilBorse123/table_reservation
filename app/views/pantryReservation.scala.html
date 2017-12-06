@@ -1,0 +1,289 @@
+@import helper._ ;
+@import views._ ; var status=""; var radioStatus = "";
+
+@(name:String,empId:Integer,message:String,empList:List[models.Employee]
+,pmList:List[models.PantryMapping],slots:List[String],resForm:Form[_])
+
+@main("DPA Reservation") {
+    <div class = "container">
+    	<div class="row">
+    		<div class="col-md-2">
+    			<div class="panel panel-info">
+    				<div class="panel-heading">
+    					Booked Slots:
+    				</div>
+    				<div class="panel-body">
+    					<table class="table table-hover" id="slotsTable">
+  							<thead>
+  								<th>24 Hr Format</th>
+  							</thead>
+  							<tbody>
+							 	@for((slot,ctr) <- slots.zipWithIndex){
+									<tr>
+										<td>@slot</td>	
+									</tr>	 	
+							 	}							
+  							</tbody>
+  						</table>
+    				</div>
+    			</div>
+    		</div>
+    		<div class="col-md-10">
+    			@customalert()
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						Reservation: @message
+						<a href="/viewPantryHistory" target="new" class = "pull-right">View Reservations</a>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-4">
+								@form(action = routes.PantryController.handlePantry(), 'id-> "confForm" ,'method-> "post"){
+					  				<input type="hidden" name = "selectedMembers" id="selectedMembers" value=""/>
+					  				<input type="hidden" name = "tableType" id="tableType" value=""/>
+					  				<form class="form-inline" role="form">
+										<div class="form-group" style="width:230px;">
+										    @helper.inputText(resForm("empName"),
+												'id -> "eName",
+												'name -> "eName",
+												'readonly -> "readonly",
+												'placeholder -> name,
+												'style -> "font-weight:bold;",
+												'class -> "form-control required",
+												'_label-> "Employee Name:",
+												'_showConstraints -> false,
+												'_showErrors -> true
+											)
+								 	 	</div>
+										<div class="form-group" style="width:100px;">
+										    @helper.inputText(resForm("empId"),
+												'id -> "eId",
+												'name -> "eId",
+												'placeholder -> empId,
+												'style -> "font-weight:bold;",
+												'readonly -> "readonly",
+												'class -> "form-control required",
+												'_label-> "Employee Id:",
+												'_showConstraints -> false,
+												'_showErrors -> true
+											)
+										</div>
+										<div class="form-group">
+											<label for="sTime">Start Time (Eg [10:30]):</label>
+			    							<input type="text" class="form-control" id="sTime" style="width:230px;" onkeyup="setEndTime(this)"/>
+			    						</div>
+			    						<div style="display:none">
+											<div class="form-group" style="width:230px;">
+												@helper.inputText(resForm("startTime"),
+													'id -> "startTime",
+													'name -> "startTime",
+													'class -> "form-control required",
+													'_label-> "Start Time (Eg [09:30]):",
+													'_showConstraints -> false,
+													'_showErrors -> true
+												)
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="eTime">End Time (Eg [15:30]):</label>
+			    							<input type="text" class="form-control" id="eTime" style="width:230px;" readonly>
+			    						</div>
+			    						<div style="display:none">
+											<div class="form-group" style="width:230px;">
+											    @helper.inputText(resForm("endTime"),
+													'id -> "endTime",
+													'name -> "endTime",
+													'class -> "form-control required",
+													'_label-> "End Time (Eg [15:30]):",
+													'_showConstraints -> false,
+													'_showErrors -> true
+												)
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="memName">Filter Name:</label>
+											<input type="text" name="filt" onkeyup="filterTable(this, memListTable)" style="width:130px;" class="form-control"/>
+										</div>
+																			
+										
+										<label class="radio-inline"><input type="radio" id="smallTable" name="optradio"><b>Small Table<b></label>
+										<label class="radio-inline"><input type="radio" id="bigTable" name="optradio"><b>Big Table<b></label>
+										
+									</form>
+								}
+							</div>
+							<div class="col-md-4">
+								
+								<div class="pre-scrollable" style="max-height: 350px; max-width:350px;">
+			  						<table class="table table-hover" id="memListTable">
+			  							<thead>
+			  								<th>Employee</th>
+			  								<th>Select</th>
+			  							</thead>
+			  							<tbody>
+					  						@for((empl,ctr) <- empList.zipWithIndex){
+					  							@(status = "notpresent")
+					  							@for((pml,ctr) <- pmList.zipWithIndex if status == "notpresent"){
+					  								@if(pml.resEmpId == empl.id || pml.resdEmpId == empl.id){
+				  										<tr class="danger">
+					  										<td id="@empl.empId" name="selectedEmployee" value="@empl.empFirstName">@(empl.empFirstName + " " + empl.empLastName)</td>
+					  										<td><input type="checkbox" disabled="disabled" id="checkBox#@empl.empId" onclick="appendToTextArea(this.id)"/></td>
+					  									</tr>
+					  									@(status = "present")
+					  								}
+				  								}
+				  								@if(status != "present"){
+				  									<tr>
+				  										<td id="@empl.empId" name="selectedEmployee" value="@empl.empFirstName">@(empl.empFirstName + " " + empl.empLastName)</td>
+				  										<td><input type="checkbox" id="checkBox#@empl.empId" onclick="appendToTextArea(this.id)"/></td>
+				  									</tr>
+				  								}
+					  						}
+				  						</tbody>
+			  						</table>
+	  							</div>
+							</div>
+							<div class="col-md-4">
+								
+								<h5><b>Members Selected:<b></h5>
+								<table class="table table-striped table-hover table-bordered" id="memTable">
+									<tbody id="memTableBody">
+									</tbody>
+								</table>
+								
+							</div>
+						</div>
+					</div>
+					<div class = "panel-footer">
+						<input type="button" onclick=submitForm() class="btn btn-info" value="Submit">
+						<a href="/" class="btn btn-warning pull-right" role="button">Back</a>
+					</div>
+				</div>
+			</div>
+    	</div>
+    </div>
+}
+
+<script type="text/javascript">
+	
+	function submitForm(){
+		
+		document.getElementById('eId').value = document.getElementById("eId").placeholder
+		document.getElementById('eName').value = document.getElementById("eName").placeholder
+		assignLongTime('sTime');
+		assignLongTime('eTime');
+		assignSelectedMembers();
+		assignTableType();
+		document.getElementById('confForm').submit();
+		
+	}
+	
+	function assignTableType(){
+		if(document.getElementsByName('optradio')[0].checked == true){
+			document.getElementById('tableType').value = 'smallTable';
+		}else if(document.getElementsByName('optradio')[1].checked == true){
+			document.getElementById('tableType').value = 'bigTable';
+		}
+	}
+	
+	function getLongTime(id){
+		time = document.getElementById(id).value;
+		console.log('time :' + time);
+		var timeReg = new RegExp('^([\\d]{1,2}:[\\d]{2})$');
+		console.log('timeReg.test() :' + timeReg.test(time))
+		if(!timeReg.test(time)){
+			return false;
+		}
+		var d = new Date();
+		var hours = parseInt(time.split(":")[0]);
+		var minutes = parseInt(time.split(":")[1]);
+		if(parseInt(hours) > 24 || parseInt(minutes) > 60){
+			return false;
+		}
+		d.setHours(hours);
+		d.setMinutes(minutes);
+		document.getElementById(id).value = d.getTime();
+		return true; 
+	}
+	
+	function validations(){
+		console.log(document.getElementById('hiddenstartTime').value +':'+ document.getElementById('hiddenendTime').value)		
+		if(validation.validateEmpName(document.getElementById('eName').value)){
+			if(validation.validateEmpId(document.getElementById('eId').value)){
+				if(validation.validateTime(document.getElementById('hiddenstartTime').value,document.getElementById('hiddenendTime').value)){
+					return true;	
+				}
+			}
+		}
+	}
+	
+	function appendToTextArea(id){
+		//val = document.getElementById('members').value;
+		memId = id.split("#")[1];
+		memName = document.getElementById(memId).innerHTML;
+		var table = document.getElementById("memTable");
+		if(document.getElementById(id).checked){
+			var row = table.insertRow(0);
+			row.id = 'memId:'+memId
+			row.style="text-align:center"
+			var cell1 = row.insertCell(0);
+			cell1.innerHTML = memName;
+			empVal = document.getElementById('selectedMembers').value;
+			empVal = empVal + row.id + '###';
+			document.getElementById('selectedMembers').value = empVal;
+		}else{
+			var row = document.getElementById('memId:'+memId);
+    		row.parentNode.removeChild(row);
+    		empVal = document.getElementById('selectedMembers').value;
+    		empVal = empVal.replace('memId:'+memId+'###',"");
+    		document.getElementById('selectedMembers').value = empVal;
+		}
+	}
+	
+	function setEndTime(elem){
+		var timeReg = new RegExp('^([\\d]{1,2}:[\\d]{2})$');
+		if(timeReg.test(elem.value)){
+			 hours = parseInt(elem.value.split(":")[0])
+			 minutes = parseInt(elem.value.split(":")[1])
+			 minutes = minutes + 30;
+			 if(minutes > 60){
+			 	hours = hours + 1;
+			 	minutes = minutes - 60;
+			 	if(minutes < 10){ minutes = '0' + minutes.toString(); }
+			 }else if(minutes == 60){
+			 	hours = hours + 1;
+			 	minutes = '00';
+			 }
+			 if(hours < 10){
+			 	hours = '0' + hours.toString();
+			 }else if(hours == 24){ hours = '00'; }
+			 document.getElementById('eTime').value = hours+':'+minutes;
+		}
+	}
+	
+	function assignLongTime(id){
+		time = document.getElementById(id).value;
+		var d = new Date();
+		var hours = parseInt(time.split(":")[0]);
+		var minutes = parseInt(time.split(":")[1]);
+		if(parseInt(hours) > 24 || parseInt(minutes) > 60){
+			return false;
+		}
+		d.setHours(hours);
+		d.setMinutes(minutes);
+		if(id == 'sTime'){
+			document.getElementById('startTime').value = d.getTime();
+		}else if(id == 'eTime'){
+			document.getElementById('endTime').value = d.getTime();
+		}
+	}
+
+	function assignSelectedMembers(){
+		
+	}
+	
+	function changeDDName(){
+		alert('Hello');
+	}
+	
+</script>

@@ -1,0 +1,28 @@
+@import helper._
+@import views._
+
+<div>
+	<!--Flash Messages-->
+	@if(flash.get("error")){
+		<div class="alert alert-danger" role="alert" id="flashDiv">
+		  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+		  <strong>Error : </strong>
+		  @flash.get("error")
+		</div>
+	}
+	<!--Flash Messages Ends-->
+	@if(flash.get("success")){
+		<div class="alert alert-success" role="alert" id="flashDiv">
+		  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+		  @flash.get("success")
+		</div>
+	}
+	@if(flash.get("warning")){
+		<div class="alert alert-warning" id="flashDiv">
+  			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  			<strong>Warning : </strong>
+		  	@flash.get("warning")
+		</div>
+	}
+	
+</div>
